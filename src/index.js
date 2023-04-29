@@ -1,4 +1,3 @@
-//* При натисканні на самбіт в окремому файлі айпі жс виконується запит з інтупу та повертає данні в консоль
 import Notiflix from 'notiflix';
 import fetchImages from './components/api';
 
@@ -17,34 +16,32 @@ function onSubmitBtn(e) {
   const value = refs.input.value.trim();
   refs.divGallery.innerHTML = ' ';
   pageNumber = 1;
-  fetchImages(value, pageNumber).then(res => {
-    console.log(res);
-    if (res.hits.length === 0) {
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    } else if (res.totalHits <= 40) {
-      Notiflix.Notify.info(
-        "We're sorry, but you've reached the end of search results."
-      );
-      const images = res.hits;
 
-      refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
-    } else {
-      Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
-      const images = res.hits;
+  fetchImages(value, pageNumber)
+    .then(res => {
+      console.log(res);
+      if (res.hits.length === 0) {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else if (res.totalHits <= 40) {
+        Notiflix.Notify.info(
+          "We're sorry, but you've reached the end of search results."
+        );
+        const images = res.hits;
 
-      refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
-      refs.loadMoreBtn.classList.remove('invisible');
-    }
-  });
-  // .catch(error => {
-  //   if (error.message === '404') {
-  //     // Notiflix.Notify.failure('Oops, there is no country with that name!');
-  //   } else {
-  //     console.log(error.message);
-  //   }
-  // });
+        refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
+      } else {
+        Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
+        const images = res.hits;
+
+        refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
+        refs.loadMoreBtn.classList.remove('invisible');
+      }
+    })
+    .catch(error => {
+      console.log(error.message);
+    });
 }
 
 function makeMarkup(images) {
@@ -91,7 +88,7 @@ function incrementPage() {
   return (pageNumber += 1);
 }
 
-function onLoadMoreBtn() {
+async function onLoadMoreBtn() {
   const value = refs.input.value.trim();
   fetchImages(value, incrementPage()).then(res => {
     if (res.totalHits <= 40) {
