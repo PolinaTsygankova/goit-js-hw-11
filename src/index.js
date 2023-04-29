@@ -10,20 +10,32 @@ const refs = {
   loadMoreBtn: document.querySelector('.load-more'),
 };
 
+let pageNumber = 1;
+
 function onSubmitBtn(e) {
   e.preventDefault();
   const value = refs.input.value.trim();
   refs.divGallery.innerHTML = ' ';
-  fetchImages(value).then(res => {
+  pageNumber = 1;
+  fetchImages(value, pageNumber).then(res => {
+    console.log(res);
     if (res.hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
+    } else if (res.totalHits <= 40) {
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+      const images = res.hits;
+
+      refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
     } else {
       Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
       const images = res.hits;
 
       refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
+      refs.loadMoreBtn.classList.remove('invisible');
     }
   });
   // .catch(error => {
@@ -75,16 +87,24 @@ function makeMarkup(images) {
     .join(' ');
 }
 
-let pageNumber = 0;
-
-function onLoadMoreForIncrementPage() {
-  let sum = (pageNumber += 1);
-  console.log(sum);
-  return sum;
+function incrementPage() {
+  return (pageNumber += 1);
 }
 
-const result = onLoadMoreForIncrementPage();
-console.log(result);
+function onLoadMoreBtn() {
+  const value = refs.input.value.trim();
+  fetchImages(value, incrementPage()).then(res => {
+    if (res.totalHits <= 40) {
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+      refs.loadMoreBtn.classList.add('invisible');
+    }
+    const images = res.hits;
 
-refs.loadMoreBtn.addEventListener('click', onLoadMoreForIncrementPage);
+    refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
+  });
+}
+
+refs.loadMoreBtn.addEventListener('click', onLoadMoreBtn);
 refs.form.addEventListener('submit', onSubmitBtn);

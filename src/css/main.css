@@ -81,6 +81,7 @@ button:hover {
   font-size: 24px;
   margin-left: 45.2%;
   margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .load-more:hover {
@@ -106,20 +107,6 @@ img {
   padding: 0;
 }
 
-/* <div class="photo-card">
-            <img src="${webformatURL}" alt="${tags}" loading="lazy" width=320 height=220 />
-            <div class="info">
-                  <p class="info-item">
-                        <b>Likes ${likes}</b>
-                 </p>
-                <p class="info-item">
-                    <b>Views ${views}</b>
-                </p>
-                <p class="info-item">
-                    <b>Comments ${comments}</b>
-                </p>
-                <p class="info-item">
-                    <b>Downloads ${downloads}</b>
-                </p>
-            </div>
-        </div> */
+.invisible {
+  display: none;
+}
