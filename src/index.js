@@ -19,11 +19,12 @@ function onSubmitBtn(e) {
 
   fetchImages(value, pageNumber)
     .then(res => {
-      console.log(res);
       if (res.hits.length === 0) {
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
+      } else if (value === '') {
+        Notiflix.Notify.failure('Please write what you want to find.');
       } else if (res.totalHits <= 40) {
         Notiflix.Notify.info(
           "We're sorry, but you've reached the end of search results."
@@ -59,7 +60,9 @@ function makeMarkup(images) {
 
       return `
         <div class="photo-card">
-            <img src="${webformatURL}" alt="${tags}" loading="lazy" width=320 height=220 />
+          <div class="photo-wrapper"> 
+            <img src="${webformatURL}" alt="${tags}" loading="lazy" width=320 height=240 />
+            </div>
             <div class="info">
                   <p class="info-item">
                         <b>Likes</b>
@@ -90,13 +93,19 @@ function incrementPage() {
 
 async function onLoadMoreBtn() {
   const value = refs.input.value.trim();
+
   fetchImages(value, incrementPage()).then(res => {
-    if (res.totalHits <= 40) {
+    const pageAmount = Math.ceil(res.totalHits / 40);
+
+    if (pageNumber < pageAmount) {
+      refs.loadMoreBtn.classList.remove('invisible');
+    } else if (pageNumber === pageAmount) {
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
       refs.loadMoreBtn.classList.add('invisible');
     }
+
     const images = res.hits;
 
     refs.divGallery.insertAdjacentHTML('beforeend', makeMarkup(images));
